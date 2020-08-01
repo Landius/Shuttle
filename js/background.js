@@ -14,7 +14,7 @@ const defaultData = {
     profile:{
       defaultProxy: "direct",
       rules: [
-        {proxyName: 'example', hosts: []}
+        {proxyName: 'proxy', hosts: []}
       ],
     },
 },
@@ -26,7 +26,7 @@ let icon = {
   ACTIVE: { path: "img/icon_filled.svg" },
   state: 'NORMAL'
 }
-let activeTab = {id: -1, url: '', currentProxy: 'direct'}; 
+let activeTab = {id: -1, url: '', currentProxy: 'direct', currentActive: null}; 
 storage.get(null, (result) => {
   if (browser.runtime.lastError) {
     console.log(browser.runtime.lastError);
@@ -144,7 +144,7 @@ function getProxyByUrl(url){
       for(const rule of profile.rules){
         if(rule.hosts.includes(urlObject.host)){
           // override default proxy if find host in rules
-          proxyName = rule.proxy;
+          proxyName = rule.proxyName;
         }
       }
     }

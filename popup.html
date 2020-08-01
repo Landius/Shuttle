@@ -12,7 +12,7 @@
             width: max-content;
         }
         #status{
-            box-shadow: 0 1px 3px 0 #0003;
+            box-shadow: 0 1px 2px 0 #0003;
             margin-bottom: .5em;
             background-color: #eef5;
         }
@@ -28,17 +28,27 @@
         #buttons{
             margin: auto;
         }
+        #host-input{
+            box-sizing: border-box;
+            border: none;
+            border-radius: 2px;
+            box-shadow: 0 1px 2px 0 #0003;
+            padding: 5px 8px;
+            width: 100%;
+            min-width: max-content;
+            margin-bottom: .5em;
+        }
         button{
             position: relative;
             line-height: 1.5;
-            padding: 5px 10px;
+            padding: 3px 6px;
             border: none;
             border-radius: 2px;
             outline: none;
             user-select: none;
             background-color: #eef5;
             min-width: 4rem;
-            box-shadow: 0 1px 3px 0 #0003;
+            box-shadow: 0 1px 2px 0 #0003;
             cursor: pointer;
             margin: 3px;
         }
@@ -50,10 +60,11 @@
         }
         button:active{
             top: 1px;
-            box-shadow: 0 1px 2px 0px #0002;
+            box-shadow: 0 1px 1px 0px #0002;
         }
         button.active{
             background-color: #defa;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -76,8 +87,12 @@
         </div>
     </div>
     <div id="switch-panel" style="display: none;">
-        <div id="proxies"></div>
-        <div id="profiles"></div>
+        <div id="proxies">
+            <span>Proxies: </span>
+        </div>
+        <div id="profiles">
+            <span>Profiles: </span>
+        </div>
     </div>
     <div id="edit-panel" style="display: none;">
         <input type="text" id="host-input">
