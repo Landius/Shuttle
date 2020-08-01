@@ -14,14 +14,19 @@ const defaultData = {
     profile:{
       defaultProxy: "direct",
       rules: [
-        {proxy: 'example', urls: []}
+        {proxyName: 'example', hosts: []}
       ],
     },
 },
 };
 // init data
 let data = null;
-let activeTab = {id: -1, url: ''}; 
+let icon = {
+  NORMAL: { path: "img/icon.svg" },
+  ACTIVE: { path: "img/icon_filled.svg" },
+  state: 'NORMAL'
+}
+let activeTab = {id: -1, url: '', currentProxy: 'direct'}; 
 storage.get(null, (result) => {
   if (browser.runtime.lastError) {
     console.log(browser.runtime.lastError);
@@ -32,20 +37,33 @@ storage.get(null, (result) => {
     data = result;
   }
   // handle requests
-  browser.proxy.onRequest.addListener(handleRequest, {urls: ["<all_urls>"]});
+  browser.proxy.onRequest.addListener(requestInfo=>{
+    let url = requestInfo.documentUrl;
+    if(url == undefined){
+      console.log(requestInfo);
+      url = requestInfo.url;
+    }
+    let proxy = getProxyByUrl(url);
+    return proxy.proxyInfo;
+  }, {urls: ["<all_urls>"]});
+
   browser.proxy.onError.addListener(error=>{
     console.error(error);
   });
+
   // handle msg
   browser.runtime.onMessage.addListener(handleMsg);
 
+
+  setIcon(); // init icon
+
   // change addon icon if current page is using proxy
-  browser.tabs.onActivated.addListener(handleTabEvent);
-  browser.tabs.onUpdated.addListener(handleTabEvent, {
+  browser.tabs.onActivated.addListener(setIcon);
+  browser.tabs.onUpdated.addListener(setIcon, {
     properties:['status'],
     windowId: browser.windows.WINDOW_ID_CURRENT
   });
-  browser.windows.onFocusChanged.addListener(handleTabEvent);
+  browser.windows.onFocusChanged.addListener(setIcon);
 });
 
 
@@ -56,79 +74,77 @@ function handleMsg(msg, sender, sendResponse){
       break;
     case 'setActive':
       data.active = msg.active;
+      setIcon();
       break;
-    case 'addRule':
-      addRule(msg.profileName, msg.rule);
+    case 'editRule':
+      editRule(msg.rule);
+      setIcon();
+      sendResponse();
       break;
-    case 'removeRule':
-      removeRule(msg.profileName, msg.rule);
     default:
       break;
   }
 }
 
-function handleRequest(requestInfo){
-  let proxyInfo = {};
-  if(data.active.type == 'proxy'){
-    let proxy = data.proxies[data.active.name];
-    proxyInfo = {...proxy};
-  }else{
-    const profile = data.profiles[data.active.name];
-    const host = (new URL(requestInfo.documentUrl)).host;
-    for(const rule of profile.rules){
-      if(rule.urls.includes(host)){
-        let proxy = data.proxies[rule.proxy] || data.proxies[rule.defaultProxy];
-        proxyInfo = {...proxy};
-      }
-    }
-  }
-  // console.log(requestInfo, proxyInfo);
-  return proxyInfo;
-}
-
-function handleTabEvent(){
+function setIcon(){
   const winId = browser.windows.WINDOW_ID_CURRENT;
   browser.tabs.query({active: true, windowId: winId}).then(result=>{
     if(result.length != 1){
       console.error('result of tabs.query:', result);
     }else{
+      const proxy = getProxyByUrl(result[0].url);
       activeTab.id = result[0].id;
       activeTab.url = result[0].url;
-      setIcon(activeTab.url);
+      activeTab.currentProxy = proxy.proxyName;
+      let state = (proxy.proxyName == 'direct' ? 'NORMAL' : 'ACTIVE');
+      if(state != icon.state){
+        // only change icon if needed
+        browser.browserAction.setIcon(icon[state]);
+        icon.state = state;
+      }
     }
   }).catch(error=>{ console.error(error); });
 }
 
-function setIcon(url){
-  const urlObject = new URL(url);
-  const normalIcon = { path: "img/icon.svg" };
-  const activeIcon = { path: "img/icon_filled.svg" };
-  let icon = null;
-  if(urlObject.protocol == "about:" || urlObject.protocol == 'moz-extension:'){
-    icon = normalIcon;
-  }else if(data.active.type == 'proxy'){
-    if(data.active.name == 'direct'){
-      icon = normalIcon;
-    }else{
-      icon = activeIcon;
-    }
-  }else if(data.active.type == 'profile'){
-    let host = urlObject.host;
-    let profile = data.profiles[data.active.name];
-    if(profile.defaultProxy == 'direct'){
-      for(let rule of profile.rules){
-        if(rule.urls.includes(host) && rule.proxy != 'direct'){
-          icon = activeIcon;
-        }
+function editRule(rule){
+  const profile = data.profiles[data.active.name];
+  let isExist = false;
+  for(const profileRule of profile.rules){
+    const hostIndex = profileRule.hosts.indexOf(rule.host);
+    if(profileRule.proxyName == rule.proxyName){
+      if(hostIndex == -1){
+        profileRule.hosts.push(rule.host);
       }
-    }else if(profile.defaultProxy != 'direct'){
-      icon = activeIcon;
-      for(let rule of profile.rules){
-        if(rule.urls.includes(host) && rule.proxy == 'direct'){
-          icon = normalIcon;
+      isExist = true;
+    }else if(hostIndex != -1){
+      // delete host if proxyName not match
+      profileRule.hosts.splice(hostIndex, 1);
+    }
+  }
+  if(isExist == false){
+    const newRule = {proxyName: rule.proxyName, hosts:[rule.host]};
+    profile.rules.push(newRule);
+  }
+}
+
+function getProxyByUrl(url){
+  const supportedProtocol = ["http:", "https:", "ws:", "wss:", "ftp:", "ftps:"];
+  const urlObject = new URL(url);
+  let proxyName = 'direct';
+  if(supportedProtocol.includes(urlObject.protocol)){
+    if(data.active.type == 'proxy'){
+      proxyName = data.active.name;
+    }else{
+      const profile = data.profiles[data.active.name];
+      proxyName = profile.defaultProxy;
+      for(const rule of profile.rules){
+        if(rule.hosts.includes(urlObject.host)){
+          // override default proxy if find host in rules
+          proxyName = rule.proxy;
         }
       }
     }
   }
-  browser.browserAction.setIcon(icon);
+  let proxyInfo = data.proxies[proxyName];
+  return {proxyName, proxyInfo};
 }

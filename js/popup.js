@@ -1,4 +1,4 @@
-browser.runtime.sendMessage({cmd: 'getData'}, result=>{
+browser.runtime.sendMessage({cmd: 'getData'}).then(result=>{
     const d = document;
     const data = result;
     const proxyTile = d.querySelector('#proxy-tile');
@@ -46,10 +46,44 @@ browser.runtime.sendMessage({cmd: 'getData'}, result=>{
     }
 
     function editRule(){
-        // todo
-        const panel = d.querySelector('#editPanel');
-        const url = new URL(browser.tabs.query())
-        d.querySelector('#main').style.display = 'none';
+        browser.runtime.sendMessage({msg:'getActiveTab'}).then(activeTab=>{
+            const panel = d.querySelector('#editPanel');
+            const hostInput = d.querySelector('input#current-host');
+            const selectProxyTile = d.querySelector('#select-proxy-tile');
+            const host = (new URL(activeTab.url)).host;
+            // fill host input
+            hostInput.value = host;
+            // add proxy options
+            
+            for(const key in data.proxies){
+                const proxy = data.proxies[key];
+                const attribs = {
+                    'data-name': key
+                };
+                addBtn(key, attribs, selectProxyTile, chooseProxy);
+            }
+            // show panel
+            d.querySelector('#switchPanel').style.display = 'none';
+            panel.style.display = 'block';
+        }).catch(error=>{
+            console.error(error);
+        });
+
+        function chooseProxy(e){
+            const dataset = e.target.dataset;
+            const msg = {
+                cmd: 'editRule',
+                rule: {
+                    host: hostInput.value,
+                    proxyName: dataset.name
+                }
+            };
+            browser.runtime.sendMessage(msg).then(()=>{
+                d.querySelector('#switchPanel').style.display = 'block';
+                panel.style.display = 'none';
+            });
+            
+        }
     }
 
     function setActive(e) {

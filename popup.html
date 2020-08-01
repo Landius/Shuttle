@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shuttle</title>
     <style>
-        #main{
+        #switchPanel{
             width: max-content;
             min-height: 2rem;
         }
@@ -33,7 +33,7 @@
     </style>
 </head>
 <body>
-    <div id="main">
+    <div id="switchPanel">
         <!-- choose a proxy or profile -->
         <div id="proxy-tile">
             
@@ -50,8 +50,11 @@
 
         </div>
     </div>
-    <div id="editPanel">
-        
+    <div id="editPanel" style="display:none;">
+        <input type="text" id="current-host">
+        <div id="select-proxy-tile">
+
+        </div>
     </div>
     <script type="text/javascript" src="js/popup.js"></script>
 </body>
