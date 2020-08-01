@@ -1,99 +1,128 @@
-browser.runtime.sendMessage({cmd: 'getData'}).then(result=>{
-    const d = document;
-    const data = result;
-    const proxyTile = d.querySelector('#proxy-tile');
-    const profileTile = d.querySelector('#profile-tile');
-    const editTile = d.querySelector('#edit-tile');
-    const optionTile = d.querySelector('#option-tile');
-    // add proxy btns
-    for(const key in data.proxies){
-        const proxy = data.proxies[key];
-        const attribs = {
-            'data-name': key,
-            'data-type': 'proxy'
-        };
-        addBtn(key, attribs, proxyTile, setActive);
+const dm = {
+    '$': selector=>{ return document.querySelector(selector); },
+    '$$': selector=>{ return document.querySelectorAll(selector); }
+}
+const originalHTML = dm.$('#main-panel').innerHTML;
+browser.runtime.sendMessage({cmd: 'getActiveTab'}).then(renderStatus);
+
+function renderStatus(activeTab){
+    window.activeTab = activeTab;
+    const urlObject = new URL(activeTab.url);
+    const supportedProtocol = ["http:", "https:", "ws:", "wss:", "ftp:", "ftps:"];
+    const isSupported = supportedProtocol.includes(urlObject.protocol);
+    const isProfile = activeTab.currentActive.type == 'profile' ? true : false;
+    let hostInfo, statusInfo;
+    if(isSupported){
+        hostInfo = urlObject.host;
+        statusInfo = activeTab.currentProxy;
+        if(isProfile){
+            statusInfo = activeTab.currentActive.name + ' => ' + statusInfo;
+        }
+    }else{
+        hostInfo = 'Unsupport protocol';
+        statusInfo = 'pass';
     }
-    // add profile btns
-    for(const key in data.profiles){
-        const profile = data.profiles[key];
-        const attribs = {
-            'data-name': key,
-            'data-type': 'profile'
-        };
-        addBtn(key, attribs, profileTile, setActive);
-    }
-    // add edit btn if data.active.type == profile
-    if(data.active.type == 'profile'){
-        addBtn('edit', {}, editTile, editRule);
-    }
-    // add option btn
-    addBtn('option', {}, optionTile, e=>{
-        const url = './options.html';
-        browser.tabs.create({url: url, active: true});
+    dm.$('#host-span').innerText = hostInfo;
+    dm.$('#status-span').innerText = statusInfo;
+    dm.$('#switch-btn').addEventListener('click', switchProxy);
+    dm.$('#edit-btn').addEventListener('click', editRule);
+    dm.$('#edit-btn').style.display = isProfile && isSupported ? 'inline' : 'none';
+    dm.$('#option-btn').addEventListener('click', e=>{
+        browser.tabs.create({url: './options.html', active: true});
         window.close();
     });
+}
 
-    function addBtn(label, attribs, parentEl, callback){
-        let btn = document.createElement('button');
-        btn.innerText = label;
-        for(let key in attribs){
-            btn.setAttribute(key, attribs[key]);
-        }
-        btn.addEventListener('click', callback);
-        parentEl.append(btn);
-        return btn;
-    }
-
-    function editRule(){
-        browser.runtime.sendMessage({msg:'getActiveTab'}).then(activeTab=>{
-            const panel = d.querySelector('#editPanel');
-            const hostInput = d.querySelector('input#current-host');
-            const selectProxyTile = d.querySelector('#select-proxy-tile');
-            const host = (new URL(activeTab.url)).host;
-            // fill host input
-            hostInput.value = host;
-            // add proxy options
-            
-            for(const key in data.proxies){
-                const proxy = data.proxies[key];
-                const attribs = {
-                    'data-name': key
-                };
-                addBtn(key, attribs, selectProxyTile, chooseProxy);
+function switchProxy(){
+    browser.runtime.sendMessage({cmd:'getData'}).then(data=>{
+        const proxiesDiv = dm.$('#proxies');
+        const profilesDiv = dm.$('#profiles');
+        // add proxy btns
+        for(const key in data.proxies){
+            const proxy = data.proxies[key];
+            const attribs = {
+                'data-name': key,
+                'data-type': 'proxy'
+            };
+            if(data.active.type == 'proxy' && key == data.active.name){
+                attribs.class = 'active';
             }
-            // show panel
-            d.querySelector('#switchPanel').style.display = 'none';
-            panel.style.display = 'block';
-        }).catch(error=>{
-            console.error(error);
-        });
+            addBtn(key, attribs, proxiesDiv, setActive);
+        }
+        // add profile btns
+        for(const key in data.profiles){
+            const profile = data.profiles[key];
+            const attribs = {
+                'data-name': key,
+                'data-type': 'profile'
+            };
+            if(data.active.type == 'profile' && key == data.active.name){
+                attribs.class = 'active';
+            }
+            addBtn(key, attribs, profilesDiv, setActive);
+        }
+        
+        // show panel
+        dm.$('#main-panel').style.display = 'none';
+        dm.$('#switch-panel').style.display = 'block';
 
-        function chooseProxy(e){
+        function setActive(e) {
             const dataset = e.target.dataset;
-            const msg = {
+            browser.runtime.sendMessage({
+                cmd: 'setActive',
+                active: {
+                    type: dataset.type,
+                    name: dataset.name
+                }
+            }, e=>{ window.close(); });
+        }
+    });
+}
+
+function addBtn(label, attribs, parentEl, callback){
+    let btn = document.createElement('button');
+    btn.innerText = label;
+    for(let key in attribs){
+        btn.setAttribute(key, attribs[key]);
+    }
+    btn.addEventListener('click', callback);
+    parentEl.append(btn);
+    return btn;
+}
+
+function editRule(){
+    browser.runtime.sendMessage({cmd:'getData'}).then(data=>{
+        const urlObject = new URL(window.activeTab.url);
+        const hostInput = dm.$('#host-input');
+        const profileSelection = dm.$('#profile-selection');
+        // fill host input
+        hostInput.value = urlObject.host;
+        // add proxy btns
+        for(const key in data.proxies){
+            const proxy = data.proxies[key];
+            const attribs = {
+                'data-name': key,
+                'data-type': 'proxy'
+            };
+            if(key == window.activeTab.currentProxy){
+                attribs.class = 'active';
+            }
+            addBtn(key, attribs, profileSelection, chooseProxy);
+        }
+        
+        // show panel
+        dm.$('#main-panel').style.display = 'none';
+        dm.$('#edit-panel').style.display = 'block';
+
+        function chooseProxy(e) {
+            const dataset = e.target.dataset;
+            browser.runtime.sendMessage({
                 cmd: 'editRule',
                 rule: {
-                    host: hostInput.value,
-                    proxyName: dataset.name
+                    proxyName: dataset.name,
+                    host: hostInput.value
                 }
-            };
-            browser.runtime.sendMessage(msg).then(()=>{
-                d.querySelector('#switchPanel').style.display = 'block';
-                panel.style.display = 'none';
-            });
-            
+            }, e=>{ window.close(); });
         }
-    }
-
-    function setActive(e) {
-        const dataset = e.target.dataset;
-        browser.runtime.sendMessage({
-            cmd: 'setActive',
-            active: {
-                type: dataset.type,
-                name: dataset.name
-            }
-        }, e=>{ window.close(); });
-    }
-});
+    });
+}

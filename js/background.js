@@ -72,6 +72,9 @@ function handleMsg(msg, sender, sendResponse){
     case 'getData':
       sendResponse(data);
       break;
+    case 'getActiveTab':
+      sendResponse(activeTab);
+      break;
     case 'setActive':
       data.active = msg.active;
       setIcon();
@@ -96,6 +99,7 @@ function setIcon(){
       activeTab.id = result[0].id;
       activeTab.url = result[0].url;
       activeTab.currentProxy = proxy.proxyName;
+      activeTab.currentActive = data.active;
       let state = (proxy.proxyName == 'direct' ? 'NORMAL' : 'ACTIVE');
       if(state != icon.state){
         // only change icon if needed

@@ -5,56 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shuttle</title>
     <style>
-        #switchPanel{
+        body{
+            position: relative;
+            font-size: 14px;
+            margin: .5em;
             width: max-content;
-            min-height: 2rem;
+        }
+        #status{
+            box-shadow: 0 1px 3px 0 #0003;
+            margin-bottom: .5em;
+            background-color: #eef5;
+        }
+        #status > div{
+            padding: .5em;
+        }
+        #status > div > span:first-child{
+            text-align: right;
+            display: inline-block;
+            width: 3em;
+            padding-right: 5px;
+        }
+        #buttons{
+            margin: auto;
         }
         button{
-            display: block;
-            width: 6rem;
+            position: relative;
+            line-height: 1.5;
+            padding: 5px 10px;
             border: none;
             border-radius: 2px;
-            padding: .5rem 1rem;
-            margin: 5px;
-            box-sizing: border-box;
             outline: none;
             user-select: none;
-            background-color: #eefe;
+            background-color: #eef5;
+            min-width: 4rem;
+            box-shadow: 0 1px 3px 0 #0003;
+            cursor: pointer;
+            margin: 3px;
         }
-        button:hover{
-            background-color: #ddfa;
+        button:first-child{
+            margin-left: 0;
+        }
+        button:last-child{
+            margin-right: 0;
         }
         button:active{
-            background-color: #ddff;
+            top: 1px;
+            box-shadow: 0 1px 2px 0px #0002;
         }
-        hr{
-            border: 1px solid #ccc;
+        button.active{
+            background-color: #defa;
         }
     </style>
 </head>
 <body>
-    <div id="switchPanel">
-        <!-- choose a proxy or profile -->
-        <div id="proxy-tile">
-            
+    <div id="main-panel">
+        <div id="status">
+            <div>
+                <span>Host:</span>
+                <span id="host-span"></span>
+            </div>
+            <div>
+                <span>Status:</span>
+                <span id="status-span"></span>
+            </div>
         </div>
-        <div id="profile-tile">
-
-        </div>
-        <!-- edit rule of current host, only shown if using a profile -->
-        <div id="edit-tile">
-
-        </div>
-        <!-- click to open option page -->
-        <div id="option-tile">
-
+        <div id="buttons">
+            <button id="switch-btn">Switch</button>
+            <button id="edit-btn">Edit</button>
+            <button id="option-btn">Option</button>
         </div>
     </div>
-    <div id="editPanel" style="display:none;">
-        <input type="text" id="current-host">
-        <div id="select-proxy-tile">
-
-        </div>
+    <div id="switch-panel" style="display: none;">
+        <div id="proxies"></div>
+        <div id="profiles"></div>
+    </div>
+    <div id="edit-panel" style="display: none;">
+        <input type="text" id="host-input">
+        <div id="profile-selection"></div>
     </div>
     <script type="text/javascript" src="js/popup.js"></script>
 </body>
