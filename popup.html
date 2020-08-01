@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shuttle</title>
+    <style>
+        #main{
+            width: max-content;
+            min-height: 2rem;
+        }
+        button{
+            display: block;
+            width: 6rem;
+            border: none;
+            border-radius: 2px;
+            padding: .5rem 1rem;
+            margin: 5px;
+            box-sizing: border-box;
+            outline: none;
+            user-select: none;
+            background-color: #eefe;
+        }
+        button:hover{
+            background-color: #ddfa;
+        }
+        button:active{
+            background-color: #ddff;
+        }
+        hr{
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <!-- choose a proxy or profile -->
+        <div id="proxy-tile">
+            
+        </div>
+        <div id="profile-tile">
+
+        </div>
+        <!-- edit rule of current host, only shown if using a profile -->
+        <div id="edit-tile">
+
+        </div>
+        <!-- click to open option page -->
+        <div id="option-tile">
+
+        </div>
+    </div>
+    <div id="editPanel">
+        
+    </div>
+    <script type="text/javascript" src="js/popup.js"></script>
+</body>
+</html>

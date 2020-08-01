@@ -1,16 +1,17 @@
 const storage = browser.storage.sync;
 const defaultData = {
-  active: { type: "proxy", name: "example" },
+  active: { type: "proxy", name: "proxy" },
   proxies: {
     direct: {type: 'direct'},
-    example: {
+    proxy: {
       type: "socks",
       host: "127.0.0.1",
-      port: "8480"
+      port: 8480,
+      proxyDNS: true
     },
   },
   profiles: {
-    example:{
+    profile:{
       defaultProxy: "direct",
       rules: [
         {proxy: 'example', urls: []}
@@ -18,8 +19,9 @@ const defaultData = {
     },
 },
 };
-
+// init data
 let data = null;
+let activeTab = {id: -1, url: ''}; 
 storage.get(null, (result) => {
   if (browser.runtime.lastError) {
     console.log(browser.runtime.lastError);
@@ -29,27 +31,25 @@ storage.get(null, (result) => {
   } else {
     data = result;
   }
-  
+  // handle requests
   browser.proxy.onRequest.addListener(handleRequest, {urls: ["<all_urls>"]});
-  browser.runtime.onMessage.addListener(msgHandler);
-
-  // change addon icon when using proxy
-  browser.tabs.onActivated.addListener(activeInfo=>{
-    browser.tabs.get(activeInfo.tabId).then(tab=>{
-      console.log(tab);
-      if(tab.url){
-        setIcon(tab.url);
-      }else{
-        // url might not be set when tab is activated, use onUpdated instead
-        browser.tabs.onUpdated.addListener(handleTabUpdate, {tabId: tab.tabId});
-      }
-    }).catch(error=>{
-      console.error(error);
-    });
+  browser.proxy.onError.addListener(error=>{
+    console.error(error);
   });
+  // handle msg
+  browser.runtime.onMessage.addListener(handleMsg);
+
+  // change addon icon if current page is using proxy
+  browser.tabs.onActivated.addListener(handleTabEvent);
+  browser.tabs.onUpdated.addListener(handleTabEvent, {
+    properties:['status'],
+    windowId: browser.windows.WINDOW_ID_CURRENT
+  });
+  browser.windows.onFocusChanged.addListener(handleTabEvent);
 });
 
-function msgHandler(msg, sender, sendResponse){
+
+function handleMsg(msg, sender, sendResponse){
   switch (msg.cmd) {
     case 'getData':
       sendResponse(data);
@@ -70,18 +70,33 @@ function msgHandler(msg, sender, sendResponse){
 function handleRequest(requestInfo){
   let proxyInfo = {};
   if(data.active.type == 'proxy'){
-    proxyInfo = {...data.proxies[data.active.name]};
+    let proxy = data.proxies[data.active.name];
+    proxyInfo = {...proxy};
   }else{
     const profile = data.profiles[data.active.name];
+    const host = (new URL(requestInfo.documentUrl)).host;
     for(const rule of profile.rules){
-      if(rule.urls.includes(requestInfo.documentUrl)){
+      if(rule.urls.includes(host)){
         let proxy = data.proxies[rule.proxy] || data.proxies[rule.defaultProxy];
         proxyInfo = {...proxy};
       }
     }
   }
-  console.log(requestInfo, proxyInfo);
+  // console.log(requestInfo, proxyInfo);
   return proxyInfo;
+}
+
+function handleTabEvent(){
+  const winId = browser.windows.WINDOW_ID_CURRENT;
+  browser.tabs.query({active: true, windowId: winId}).then(result=>{
+    if(result.length != 1){
+      console.error('result of tabs.query:', result);
+    }else{
+      activeTab.id = result[0].id;
+      activeTab.url = result[0].url;
+      setIcon(activeTab.url);
+    }
+  }).catch(error=>{ console.error(error); });
 }
 
 function setIcon(url){
@@ -116,9 +131,4 @@ function setIcon(url){
     }
   }
   browser.browserAction.setIcon(icon);
-}
-
-function handleTabUpdate(tabId, changeInfo, tab){
-  setIcon(tab.url);
-  browser.tabs.removeListener(handleTabUpdate);
 }

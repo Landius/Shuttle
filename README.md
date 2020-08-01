@@ -6,7 +6,8 @@ either handling all requests by setting browser proxy, or handling them by their
 
 ## toto
 
-support username and password
-show failed requests counting in icon badge
+- support username and password
+- show failed requests counting of current page in icon badge
+- icon does not change until created tab load complete
 
 > icon from Firefox Photon design resource
