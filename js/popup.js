@@ -92,11 +92,12 @@ function addBtn(label, attribs, parentEl, callback){
 
 function editRule(){
     browser.runtime.sendMessage({cmd:'getData'}).then(data=>{
-        const urlObject = new URL(window.activeTab.url);
+        // get top domain name
+        const host = new URL(window.activeTab.url).host.split('.').slice(-2).join('.');
         const hostInput = dm.$('#host-input');
         const profileSelection = dm.$('#profile-selection');
         // fill host input
-        hostInput.value = urlObject.host;
+        hostInput.value = host;
         // add proxy btns
         for(const key in data.proxies){
             const proxy = data.proxies[key];

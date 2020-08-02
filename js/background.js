@@ -32,14 +32,14 @@ let activeTab = {id: -1, url: '', currentProxy: 'direct', currentActive: null};
 let createdTab = {id: -1, url: ''};
 
 storage.get(null, (result) => {
-  if (browser.runtime.lastError) {
-    console.error(browser.runtime.lastError);
+  if(browser.runtime.lastError || Object.keys(result).length == 0){
+    console.error(browser.runtime.lastError || 'storage is empty');
     data = defaultData;
-  } else if (Object.keys(result).length == 0) {
-    data = defaultData;
-  } else {
+    storage.set(data);
+  }else{
     data = result;
   }
+
   // handle requests
   browser.proxy.onRequest.addListener(handleRequest, {urls: ["<all_urls>"]});
   browser.proxy.onError.addListener(error=>{ console.error(error); });
@@ -77,16 +77,22 @@ function handleMsg(msg, sender, sendResponse){
     case 'getActiveTab':
       sendResponse(activeTab);
       break;
+    case 'setData':
+      storage.set(data).then(sendResponse);
+      break;
     case 'setActive':
       data.active = msg.active;
+      storage.set(data);
       setIcon();
       break;
     case 'editRule':
       editRule(msg.rule);
+      storage.set(data);
       setIcon();
       sendResponse();
       break;
     default:
+      console.error('Unsupported msg:', msg);
       break;
   }
 }
@@ -171,9 +177,12 @@ function getProxyByUrl(url){
       const profile = data.profiles[data.active.name];
       proxyName = profile.defaultProxy;
       for(const rule of profile.rules){
-        if(rule.hosts.includes(urlObject.host)){
+        for(const host in rule.hosts){
           // override default proxy if find host in rules
-          proxyName = rule.proxyName;
+          if(urlObject.host.endsWith(host)){
+            // host <a.b.com> matchs rule <b.com> too
+            proxyName = rule.proxyName;
+          }
         }
       }
     }
