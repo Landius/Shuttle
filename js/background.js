@@ -33,7 +33,7 @@ let createdTab = {id: -1, url: ''};
 
 storage.get(null, (result) => {
   if (browser.runtime.lastError) {
-    console.log(browser.runtime.lastError);
+    console.error(browser.runtime.lastError);
     data = defaultData;
   } else if (Object.keys(result).length == 0) {
     data = defaultData;
@@ -62,7 +62,6 @@ storage.get(null, (result) => {
       createdTab.url = 'https://' + tab.title;
     } finally {
       setIcon();
-      console.log(createdTab);
     }
   });
   browser.tabs.onActivated.addListener(setIcon);
@@ -103,14 +102,14 @@ function handleRequest(requestInfo){
   }else{
     proxyInfoPromise = browser.tabs.get(requestInfo.tabId).then(tab=>{
       if(tab.url){
-        resolve(getProxyByUrl(tab.url).proxyInfo);
+        return getProxyByUrl(tab.url).proxyInfo;
       }else{
         reject(tab);
       }
     }).catch(error=>{
       console.error('Error in onRequest():', error);
       console.error('requestInfo:', requestInfo);
-      resolve(data.proxies.direct);
+      return data.active.type == 'proxy' ? data.proxies[data.active.name] : data.proxies[data.profiles[data.active.name].proxyName];
     });
   }
   return proxyInfoPromise || getProxyByUrl(url).proxyInfo;
@@ -136,7 +135,6 @@ function setIcon(){
         browser.browserAction.setIcon(icon[state]);
         icon.state = state;
       }
-      console.log(JSON.stringify({activeTab, icon, createdTab}));
     }
   }).catch(error=>{ console.error(error); });
 }
