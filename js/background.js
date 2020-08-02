@@ -26,7 +26,11 @@ let icon = {
   ACTIVE: { path: "img/icon_filled.svg" },
   state: 'NORMAL'
 }
-let activeTab = {id: -1, url: '', currentProxy: 'direct', currentActive: null}; 
+// store the detail of active tab
+let activeTab = {id: -1, url: '', currentProxy: 'direct', currentActive: null};
+// store the detail of newest created tab
+let createdTab = {id: -1, url: ''};
+
 storage.get(null, (result) => {
   if (browser.runtime.lastError) {
     console.log(browser.runtime.lastError);
@@ -37,32 +41,31 @@ storage.get(null, (result) => {
     data = result;
   }
   // handle requests
-  browser.proxy.onRequest.addListener(requestInfo=>{
-    let url = requestInfo.documentUrl;
-    if(url == undefined){
-      console.log(requestInfo);
-      url = requestInfo.url;
-    }
-    let proxy = getProxyByUrl(url);
-    return proxy.proxyInfo;
-  }, {urls: ["<all_urls>"]});
-
-  browser.proxy.onError.addListener(error=>{
-    console.error(error);
-  });
+  browser.proxy.onRequest.addListener(handleRequest, {urls: ["<all_urls>"]});
+  browser.proxy.onError.addListener(error=>{ console.error(error); });
 
   // handle msg
   browser.runtime.onMessage.addListener(handleMsg);
 
-
-  setIcon(); // init icon
+  // init icon
+  setIcon();
 
   // change addon icon if current page is using proxy
-  browser.tabs.onActivated.addListener(setIcon);
-  browser.tabs.onUpdated.addListener(setIcon, {
-    properties:['status'],
-    windowId: browser.windows.WINDOW_ID_CURRENT
+  browser.tabs.onCreated.addListener(tab=>{
+    createdTab.id = tab.id;
+    // A newly created tab's url is always about:blank, but the tab's title is the target url.
+    try {
+      // test if tab.title is an incomplete url
+      new URL(tab.title);
+      createdTab.url = tab.title;
+    } catch (error) {
+      createdTab.url = 'https://' + tab.title;
+    } finally {
+      setIcon();
+      console.log(createdTab);
+    }
   });
+  browser.tabs.onActivated.addListener(setIcon);
   browser.windows.onFocusChanged.addListener(setIcon);
 });
 
@@ -89,23 +92,51 @@ function handleMsg(msg, sender, sendResponse){
   }
 }
 
+function handleRequest(requestInfo){
+  let url, proxyInfoPromise;
+  if(requestInfo.documentUrl){
+    url = requestInfo.documentUrl;
+  }else if(requestInfo.tabId == -1){
+    url = requestInfo.url;
+  }else if(requestInfo.tabId == createdTab.id){
+    url = createdTab.url;
+  }else{
+    proxyInfoPromise = browser.tabs.get(requestInfo.tabId).then(tab=>{
+      if(tab.url){
+        resolve(getProxyByUrl(tab.url).proxyInfo);
+      }else{
+        reject(tab);
+      }
+    }).catch(error=>{
+      console.error('Error in onRequest():', error);
+      console.error('requestInfo:', requestInfo);
+      resolve(data.proxies.direct);
+    });
+  }
+  return proxyInfoPromise || getProxyByUrl(url).proxyInfo;
+}
+
 function setIcon(){
   const winId = browser.windows.WINDOW_ID_CURRENT;
   browser.tabs.query({active: true, windowId: winId}).then(result=>{
     if(result.length != 1){
       console.error('result of tabs.query:', result);
     }else{
-      const proxy = getProxyByUrl(result[0].url);
       activeTab.id = result[0].id;
-      activeTab.url = result[0].url;
-      activeTab.currentProxy = proxy.proxyName;
+      if(result[0].id == createdTab.id && result[0].url == 'about:blank'){
+        activeTab.url = createdTab.url;
+      }else{
+        activeTab.url = result[0].url;
+      }
+      activeTab.currentProxy = getProxyByUrl(activeTab.url).proxyName;
       activeTab.currentActive = data.active;
-      let state = (proxy.proxyName == 'direct' ? 'NORMAL' : 'ACTIVE');
+      let state = (activeTab.currentProxy == 'direct' ? 'NORMAL' : 'ACTIVE');
       if(state != icon.state){
         // only change icon if needed
         browser.browserAction.setIcon(icon[state]);
         icon.state = state;
       }
+      console.log(JSON.stringify({activeTab, icon, createdTab}));
     }
   }).catch(error=>{ console.error(error); });
 }
