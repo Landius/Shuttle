@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shuttle Options</title>
+    <link rel="stylesheet" href="css/option.css">
+</head>
+<body>
+    <div id="main">
+        <div id="sidebar">
+            <span id="title">Shuttle</span>
+            <hr>
+            <ul id="proxy-tile">
+                <span>Proxies</span>
+            </ul>
+            <ul class="new">
+                <li id="new-proxy">new</li>
+            </ul>
+            <ul id="profile-tile">
+                <span>Profiles</span>
+            </ul>
+            <ul class="new">
+                <li id="new-profile">new</li>
+            </ul>
+            <ul id="option-tile">
+                <span>Other</span>
+            </ul>
+        </div>
+        <div id="detail-tile">
+            <div id="direct-detail">
+                <span>browse without proxy</span>
+            </div>
+            <div id="proxy-detail">
+                <div>
+                    <span class="flex-left">Name:</span>
+                    <input type="text" placeholder="Required" id="proxy-name" class="flex-right">
+                </div>
+                <div>
+                    <span class="flex-left">Type:</span>
+                    <select id="proxy-type" class="flex-right">
+                        <option value="">---</option>
+                        <option value="socks">Socks</option>
+                        <option value="socks4">Socks4</option>
+                        <option value="http">Http</option>
+                        <option value="https">Https</option>
+                    </select>
+                </div>
+                <div>
+                    <span class="flex-left">Host:</span>
+                    <input type="text" placeholder="Required" id="proxy-host" class="flex-right">
+                </div>
+                <div>
+                    <span class="flex-left">Port:</span>
+                    <input type="text" placeholder="Required" id="proxy-port" class="flex-right">
+                </div>
+                <div>
+                    <span class="flex-left">Username:</span>
+                    <input type="text" placeholder="Optional" id="proxy-usr" class="flex-right">
+                </div>
+                <div>
+                    <span class="flex-left">Password:</span>
+                    <input type="text" placeholder="Optional" id="proxy-pwd" class="flex-right">
+                </div>
+                <div>
+                    <span class="flex-left">ProxyDNS:</span>
+                    <input type="checkbox" id="proxy-dns">
+                </div>
+                <hr>
+                <div>
+                    <span class="flex-left"></span>
+                    <div class="btns flex-right">
+                        <button id="delete-proxy">delete</button>
+                        <button id="confirm-proxy">confirm</button>
+                        <button id="cancel-proxy">cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div id="profile-detail">
+                <div>
+                    <span class="flex-left">Name:</span>
+                    <input type="text" id="profile-name" class="flex-right">
+                </div>
+                <div>
+                    <span class="flex-left">Default:</span>
+                    <select id="default-proxy" class="flex-right"></select>
+                </div>
+                <hr>
+                <div id="rules"></div>
+                <div style="flex-direction: row-reverse;">
+                    <button id="add-rule">add</button></div>
+                <hr>
+                <div>
+                    <span class="flex-left"></span>
+                    <div class="flex-right btns">
+                        <button id="delete-profile">delete</button>
+                        <button id="confirm-profile">confirm</button>
+                        <button id="cancel-profile">cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div id="setting-detail">
+                <input type="radio" name="" id="">
+                <span class="flex-left">refresh after switch</span>
+            </div>
+            <div id="about-detail"></div>
+        </div>
+    </div>
+    <script src="js/option.js"></script>
+</body>
+</html>

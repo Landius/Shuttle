@@ -1,0 +1,152 @@
+body{
+    background-color: #f8fff8;
+    margin: 0;
+    padding: 0;
+}
+#main{
+    display: flex;
+    width: 45%;
+    min-width: 600px;
+    margin: auto;
+    padding: 0 2em;
+    height: 100vh;
+    color: #233;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+#sidebar{
+    flex: 0 0 80px;
+    padding: 0 10px;
+}
+#title{
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 60px 0 0 10px;
+}
+ul{
+    list-style: none;
+    margin: 5px;
+    padding: 5px;
+}
+ul.new{
+    position: relative;
+    margin: 0 5px;
+    padding: 0 5px;
+}
+ul > span{
+    font-size: 12px;
+}
+ul > li{
+    font-size: 14px;
+    border-radius: 3px;
+    padding: 3px 9px;
+    margin: 3px;
+    cursor: pointer;
+    user-select: none;
+}
+ul.new > li{
+    position: relative;
+    top: -10px;
+    margin: 0 3px;
+}
+ul > li:hover{
+    background-color: #efeff5dd;
+}
+ul > li:active,
+ul > li.active{
+    background-color: #efeff5;
+    box-shadow: inset 0 0 3px 0 #0003;
+}
+#detail-tile{
+    flex: 1 1 300px;
+    box-shadow: -1px 0 2px 0 #0002;
+}
+#detail-tile > div{
+    display: none;
+}
+#detail-tile > div.active{
+    display: block;
+    margin: 100px 30px;
+    padding: 1em;
+}
+#detail-tile button{
+    margin-left: 5px;
+}
+#proxy-detail > div{
+    display: flex;
+    font-size: 14px;
+    padding: 3px 0;
+    margin: 3px 0;
+}
+.flex-left{
+    padding-right: 1em;
+    display: inline-block;
+    flex: 0 0 5em;
+    min-width: 5em;
+    text-align: right;
+}
+.flex-right{
+    flex: 1 1 100px;
+    padding: 3px 6px;
+}
+div.btns{
+    padding: 0;
+    text-align: right;
+}
+hr{
+    margin: 1rem 0;
+    border: none;
+    border-bottom: 1px solid gray;
+}
+#profile-detail > div{
+    display: flex;
+    font-size: 14px;
+    padding: 3px 0;
+    margin: 3px 0;
+}
+#profile-detail > #rules{
+    display: block;
+}
+.rule{
+    display: flex;
+    width: 100%;
+    font-size: 14px;
+    padding: 3px 0;
+    margin: 3px 0;
+}
+.rule > input{
+    flex: 1 1 100px;
+}
+.rule > select{
+    flex: 0 0 8em;
+    min-width: 6em;
+    margin-left: 5px;
+}
+.rule > select{
+    flex: 0 0 0;
+}
+
+button,
+input[type=text],
+select{
+    line-height: 1.2;
+    font-size: 14px;
+    padding: 3px 6px;
+    box-sizing: border-box;
+    min-width: 5em;
+}
+/*
+button:first-child,
+input:first-child,
+select:first-child{
+    margin-top: 0;
+    margin-left: 0;
+}
+
+button:last-child,
+input:last-child,
+select:last-child{
+    margin-right: 0;
+    margin-bottom: 0;
+} */

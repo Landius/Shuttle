@@ -1,7 +1,7 @@
 const dm = {
     '$': selector=>{ return document.querySelector(selector); },
     '$$': selector=>{ return document.querySelectorAll(selector); }
-}
+};
 const originalHTML = dm.$('#main-panel').innerHTML;
 browser.runtime.sendMessage({cmd: 'getActiveTab'}).then(renderStatus);
 
@@ -28,7 +28,7 @@ function renderStatus(activeTab){
     dm.$('#edit-btn').addEventListener('click', editRule);
     dm.$('#edit-btn').style.display = isProfile && isSupported ? 'inline' : 'none';
     dm.$('#option-btn').addEventListener('click', e=>{
-        browser.tabs.create({url: './options.html', active: true});
+        browser.tabs.create({url: './option.html', active: true});
         window.close();
     });
 }

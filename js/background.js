@@ -78,6 +78,7 @@ function handleMsg(msg, sender, sendResponse){
       sendResponse(activeTab);
       break;
     case 'setData':
+      data = msg.data;
       storage.set(data).then(sendResponse);
       break;
     case 'setActive':
@@ -177,7 +178,7 @@ function getProxyByUrl(url){
       const profile = data.profiles[data.active.name];
       proxyName = profile.defaultProxy;
       for(const rule of profile.rules){
-        for(const host in rule.hosts){
+        for(const host of rule.hosts){
           // override default proxy if find host in rules
           if(urlObject.host.endsWith(host)){
             // host <a.b.com> matchs rule <b.com> too
