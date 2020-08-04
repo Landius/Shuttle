@@ -28,8 +28,6 @@ let icon = {
 }
 // store the detail of active tab
 let activeTab = {id: -1, url: '', currentProxy: 'direct', currentActive: null};
-// store the detail of newest created tab
-let createdTab = {id: -1, url: ''};
 
 storage.get(null, (result) => {
   if(browser.runtime.lastError || Object.keys(result).length == 0){
@@ -51,18 +49,10 @@ storage.get(null, (result) => {
   setIcon();
 
   // change addon icon if current page is using proxy
-  browser.tabs.onCreated.addListener(tab=>{
-    createdTab.id = tab.id;
-    // note: A newly created tab's url is always about:blank, but the tab's title should be target url.
-    // test if the tab.title is a valid url
-    try {
-      new URL(tab.title);
-      createdTab.url = tab.title;
-    } catch (error) {
-      createdTab.url = 'https://' + tab.title;
-    } finally {
-      setIcon();
-    }
+  browser.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo)=>{
+    console.log(`tab ${tabId} is updated`);
+    // set icon if url has changed
+    if(changeInfo.url) setIcon();
   });
   browser.tabs.onActivated.addListener(setIcon);
   browser.windows.onFocusChanged.addListener(setIcon);
@@ -99,13 +89,13 @@ function handleMsg(msg, sender, sendResponse){
 }
 
 function handleRequest(requestInfo){
+  console.log({...requestInfo});
   let url, proxyInfoPromise;
   if(requestInfo.documentUrl){
     url = requestInfo.documentUrl;
-  }else if(requestInfo.tabId == -1){
+  }else if(requestInfo.tabId == -1 || 'about:blank'){
+    // when the request does not belong a tab or belongs to a new tab, just pass the url
     url = requestInfo.url;
-  }else if(requestInfo.tabId == createdTab.id){
-    url = createdTab.url;
   }else{
     proxyInfoPromise = browser.tabs.get(requestInfo.tabId).then(tab=>{
       if(tab.url){
@@ -129,11 +119,7 @@ function setIcon(){
       console.error('result of tabs.query:', result);
     }else{
       activeTab.id = result[0].id;
-      if(result[0].id == createdTab.id && result[0].url == 'about:blank'){
-        activeTab.url = createdTab.url;
-      }else{
-        activeTab.url = result[0].url;
-      }
+      activeTab.url = result[0].url;
       activeTab.currentProxy = getProxyByUrl(activeTab.url).proxyName;
       activeTab.currentActive = data.active;
       let state = (activeTab.currentProxy == 'direct' ? 'NORMAL' : 'ACTIVE');
