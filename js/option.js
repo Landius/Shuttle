@@ -164,6 +164,7 @@ function renderProfileDetail(profileName) {
         const deleteBtn = document.createElement('button');
         // add classes
         ruleEl.classList.add('rule');
+        hostInput.type = 'text';
         hostInput.classList.add('host');
         proxySelect.classList.add('proxy');
         deleteBtn.classList.add('delete-rule');
@@ -254,9 +255,10 @@ function confirmProfile() {
     // todo: validate values before modifing profile
 
     // get profile info
-    const profile = {defaultProxy: undefined, rules: []}; // init an empty profile
     const profileName = dm.$('#profile-name').value;
+    const defaultProxy = dm.$('#default-proxy').value;
     const allRuleEl = dm.$$('.rule') || [];
+    const profile = {defaultProxy: defaultProxy, rules: []}; // init an empty profile
     for(const ruleEl of allRuleEl){
         // get value
         const host = ruleEl.children[0].value;

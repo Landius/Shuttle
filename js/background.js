@@ -53,9 +53,9 @@ storage.get(null, (result) => {
   // change addon icon if current page is using proxy
   browser.tabs.onCreated.addListener(tab=>{
     createdTab.id = tab.id;
-    // A newly created tab's url is always about:blank, but the tab's title is the target url.
+    // note: A newly created tab's url is always about:blank, but the tab's title should be target url.
+    // test if the tab.title is a valid url
     try {
-      // test if tab.title is an incomplete url
       new URL(tab.title);
       createdTab.url = tab.title;
     } catch (error) {
