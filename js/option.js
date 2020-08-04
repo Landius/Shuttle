@@ -145,7 +145,10 @@ function renderProfileDetail(profileName) {
         }
     });
     // handle add-rule btn event
-    dm.$('#add-rule').onclick = e=>{ addRule('', ''); };
+    dm.$('#add-rule').onclick = e=>{
+        const ruleEl = addRule('', profileInfo.defaultProxy);
+        ruleEl.firstElementChild.focus();
+    };
 
     function addOption(parent, options){
         for(const option of options){
@@ -176,6 +179,7 @@ function renderProfileDetail(profileName) {
         // append
         ruleEl.append(hostInput, proxySelect, deleteBtn);
         rulesEl.append(ruleEl)
+        return ruleEl;
     }
 }
 
@@ -278,7 +282,7 @@ function confirmProfile() {
     // change Li innerText to new profile name
     window.activeLi.innerText = profileName;
     // delete old profile
-    delete window.data[window.editing.name];
+    delete window.data.profiles[window.editing.name];
     // add new profile
     window.data.profiles[profileName] = profile;
     // save to storage
@@ -292,6 +296,7 @@ function cancel(){
 function saveData() {
     return browser.runtime.sendMessage({cmd: 'setData', data: window.data}).then(result=>{
         console.log('data saved');
+        alert('data saved');
     }).catch(error=>{
         alert('error on saving data:' + error);
     });

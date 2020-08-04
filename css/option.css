@@ -76,6 +76,12 @@ ul > li.active{
 }
 #detail-tile button{
     margin-left: 5px;
+    user-select: none;
+    position: relative;
+    background: #eee;
+}
+#detail-tile button:active{
+    top: 1px;
 }
 #proxy-detail > div{
     display: flex;
@@ -136,11 +142,13 @@ hr{
 button,
 input[type=text],
 select{
-    line-height: 1.2;
     font-size: 14px;
     padding: 3px 6px;
     box-sizing: border-box;
     min-width: 5em;
+    border: 1px solid #8888;
+    background: #fafafa;
+    outline: none;
 }
 /*
 button:first-child,

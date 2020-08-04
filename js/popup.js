@@ -19,8 +19,8 @@ function renderStatus(activeTab){
             statusInfo = activeTab.currentActive.name + ' => ' + statusInfo;
         }
     }else{
-        hostInfo = 'Unsupport protocol';
-        statusInfo = 'pass';
+        hostInfo = urlObject.protocol + '*';
+        statusInfo = 'ignored';
     }
     dm.$('#host-span').innerText = hostInfo;
     dm.$('#status-span').innerText = statusInfo;
