@@ -93,7 +93,7 @@ function addBtn(label, attribs, parentEl, callback){
 function editRule(){
     browser.runtime.sendMessage({cmd:'getData'}).then(data=>{
         // get top domain name
-        const host = new URL(window.activeTab.url).host.split('.').slice(-2).join('.');
+        const host = new URL(window.activeTab.url).host;
         const hostInput = dm.$('#host-input');
         const profileSelection = dm.$('#profile-selection');
         // fill host input
@@ -114,6 +114,7 @@ function editRule(){
         // show panel
         dm.$('#main-panel').style.display = 'none';
         dm.$('#edit-panel').style.display = 'block';
+        hostInput.focus();
 
         function chooseProxy(e) {
             const dataset = e.target.dataset;

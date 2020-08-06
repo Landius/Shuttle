@@ -50,11 +50,10 @@ storage.get(null, (result) => {
 
   // change addon icon if current page is using proxy
   browser.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo)=>{
-    console.log(`tab ${tabId} is updated`);
     // set icon if url has changed
     if(changeInfo.url) setIcon();
   });
-  browser.tabs.onActivated.addListener(setIcon);
+  browser.tabs.onActivated.addListener(setIcon); // maybe use changeInfo.attention of onUpdated is better?
   browser.windows.onFocusChanged.addListener(setIcon);
 });
 
@@ -89,7 +88,6 @@ function handleMsg(msg, sender, sendResponse){
 }
 
 function handleRequest(requestInfo){
-  console.log({...requestInfo});
   let url, proxyInfoPromise;
   if(requestInfo.documentUrl){
     url = requestInfo.documentUrl;
@@ -101,12 +99,11 @@ function handleRequest(requestInfo){
       if(tab.url){
         return getProxyByUrl(tab.url).proxyInfo;
       }else{
-        reject(tab);
+        console.warn('undefined tab.url, tab & requestInfo below: \n', tab, requestInfo);
+        return data.active.type == 'proxy' ? data.proxies[data.active.name] : data.proxies[data.profiles[data.active.name].proxyName];
       }
     }).catch(error=>{
       console.error('Error in onRequest():', error);
-      console.error('requestInfo:', requestInfo);
-      return data.active.type == 'proxy' ? data.proxies[data.active.name] : data.proxies[data.profiles[data.active.name].proxyName];
     });
   }
   return proxyInfoPromise || getProxyByUrl(url).proxyInfo;
