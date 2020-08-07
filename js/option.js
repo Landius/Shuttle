@@ -28,16 +28,24 @@ function renderMain(data){
     dm.$('#sidebar li').click();
 
     // bind functions
-    dm.$('#new-proxy').onclick = newProxy;
-    dm.$('#new-profile').onclick = newProfile;
-
-    dm.$('#delete-proxy').onclick = deleteProxy;
-    dm.$('#confirm-proxy').onclick = confirmProxy;
-    dm.$('#cancel-proxy').onclick = cancel;
-
-    dm.$('#delete-profile').onclick = deleteProfile;
-    dm.$('#confirm-profile').onclick = confirmProfile;
-    dm.$('#cancel-profile').onclick = cancel;
+    const btnFuncMap = {
+        '#new-proxy': newProxy,
+        '#delete-proxy': deleteProxy,
+        '#confirm-proxy': confirmProxy,
+        '#cancel-proxy': cancel,
+        '#new-profile': newProfile,
+        '#delete-profile': deleteProfile,
+        '#confirm-profile': confirmProfile,
+        '#cancel-profile': cancel,
+        '#import-setting': importSetting,
+        '#export-setting': exportSetting,
+        '#confirm-setting': confirmSetting,
+        '#cancel-setting': cancel
+    }
+    
+    for(const btnId in btnFuncMap){
+        dm.$(btnId).onclick = btnFuncMap[btnId];
+    }
 }
 
 function addLi(label, attribs, parentEl, callback){
@@ -58,12 +66,9 @@ function switchLi(e){
     // set li style by class attr
     const allLi = dm.$$('#sidebar li');
     for(const li of allLi){
-        if(li == t){
-            li.classList.add('active');
-        }else{
-            li.classList.remove('active');
-        }
+        li.classList.remove('active');
     }
+    t.classList.add('active');
     switch (t.dataset.type) {
         case 'proxy':
             renderProxyDetail(t.innerText);
@@ -74,6 +79,12 @@ function switchLi(e){
         case 'setting':
             renderSetting(data.setting);
             break;
+        case 'about':
+            for(const div of dm.$$('#detail-tile > div')){
+                div.classList.remove('active');
+            }
+            dm.$('#about-detail').classList.add('active');
+            break;
         default:
             break;
     }
@@ -83,12 +94,9 @@ function renderProxyDetail(proxyName){
     window.editing = {name: proxyName, type: 'proxy'};
     // set style by class attr
     for(const div of dm.$$('#detail-tile > div')){
-        if(div.id == 'proxy-detail'){
-            div.classList.add('active');
-        }else{
-            div.classList.remove('active');
-        }
+        div.classList.remove('active');
     }
+    dm.$('#proxy-detail').classList.add('active');
     // map proxy keys and element selectors
     const proxyInfo = window.data.proxies[proxyName] || {};
     const map = {
@@ -114,12 +122,9 @@ function renderProfileDetail(profileName) {
     window.editing = {name: profileName, type: 'profile'};
     // set style by class attr
     for(const div of dm.$$('#detail-tile > div')){
-        if(div.id == 'profile-detail'){
-            div.classList.add('active');
-        }else{
-            div.classList.remove('active');
-        }
+        div.classList.remove('active');
     }
+    dm.$('#profile-detail').classList.add('active');
     //  map profile keys and element selectors
     const profileInfo = window.data.profiles[profileName] || {defaultProxy: undefined, rules:[]};
     const proxyKeys = Object.keys(window.data.proxies);
@@ -184,7 +189,12 @@ function renderProfileDetail(profileName) {
 }
 
 function renderSetting(setting){
-
+    window.editing = {name: 'setting', type: 'setting'};
+    // set style by class attr
+    for(const div of dm.$$('#detail-tile > div')){
+        div.classList.remove('active');
+    }
+    dm.$('#setting-detail').classList.add('active');
 }
 
 function newProxy(){
@@ -287,6 +297,18 @@ function confirmProfile() {
     window.data.profiles[profileName] = profile;
     // save to storage
     saveData();
+}
+
+function confirmSetting() {
+
+}
+
+function importSetting() {
+
+}
+
+function exportSetting() {
+
 }
 
 function cancel(){

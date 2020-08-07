@@ -90,6 +90,7 @@
                     <select id="default-proxy" class="flex-right"></select>
                 </div>
                 <hr>
+                <span class="subtitle">Rules</span>
                 <div id="rules"></div>
                 <div style="flex-direction: row-reverse;">
                     <button id="add-rule">add</button></div>
@@ -104,10 +105,31 @@
                 </div>
             </div>
             <div id="setting-detail">
-                <input type="radio" name="" id="">
-                <span class="flex-left">refresh after switch</span>
+                <span class="title">Setting</span>
+                <hr>
+                <div>
+                    <input type="checkbox" id="">
+                    <span>refresh current page after switching proxy or editing rule in popup menu</span>
+                </div>
+                <div>
+                    <input type="checkbox" id="">
+                    <span>show failed requests counting in icon badge</span>
+                </div>
+                <hr>
+                <div>
+                    <span class="flex-left"></span>
+                    <div class="flex-right btns">
+                        <button id="import-setting">import</button>
+                        <button id="export-setting">export</button>
+                        <button id="confirm-setting">confirm</button>
+                        <button id="cancel-setting">cancel</button>
+                    </div>
+                </div>
             </div>
-            <div id="about-detail"></div>
+            <div id="about-detail">
+                <span class="title">About</span>
+                <hr>
+            </div>
         </div>
     </div>
     <script src="js/option.js"></script>

@@ -6,7 +6,7 @@ A firefox addon that helps with switching proxies by the host of page.
 
 The major difference between Shuttle and other proxy addons is that Shuttle uses a different strategy to handle cross site request.
 
-Many addons choose proxy requests just based on the urls they are sending.
+Many addons handle requests just based on the urls they are sending.
 But Shuttle analyses which tab the request comes from, then chooses proxy based on the url of the tab.
 
 Let's say we got 2 rules in a proxy profile: [ a.com => proxy1, b.com => proxy2 ].
