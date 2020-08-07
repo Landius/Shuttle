@@ -26,7 +26,8 @@ With the 2 exceptions above, Shuttle will handle proxy by request's url instead 
 ## todo
 
 - feature
-  - [ ] support username and password for http proxy
+  - [ ] add hint / tips.
+  - [x] support username and password for http proxy
   - [ ] option page.
     - [ ] bypass list
     - [ ] refresh current page after editing or switching operations in popup page

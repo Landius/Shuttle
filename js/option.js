@@ -11,6 +11,7 @@ const profileDetail = dm.$('#profile-detail');
 browser.runtime.sendMessage({cmd: 'getData'}).then(renderMain);
 
 function renderMain(data){
+    data.proxies = convertFromCredential(data.proxies);
     window.data = data;
     // add li elements to sidebar
     for(const key in data.proxies){
@@ -316,10 +317,40 @@ function cancel(){
 }
 
 function saveData() {
-    return browser.runtime.sendMessage({cmd: 'setData', data: window.data}).then(result=>{
+    const data = {...window.data};
+    data.proxies = convertToCredential(data.proxies);
+    return browser.runtime.sendMessage({cmd: 'setData', data: data}).then(result=>{
         console.log('data saved');
         alert('data saved');
     }).catch(error=>{
         alert('error on saving data:' + error);
     });
+}
+
+// find http proxies, then convert http proxy auth from usr&pwd to proxyAuthorizationHeader
+function convertToCredential(proxies){
+    let newProxies = {...proxies};
+    for(const key in newProxies){
+        proxy = newProxies[key];
+        if(proxy.type == 'http' || proxy.type == 'https'){
+            proxy.proxyAuthorizationHeader = 'Basic ' + btoa(proxy.username + ':' + proxy.password);
+            delete proxy.username;
+            delete proxy.password;
+        }
+    }
+    return newProxies;
+}
+
+function convertFromCredential(proxies) {
+    let newProxies = {...proxies};
+    for(const key in newProxies){
+        proxy = newProxies[key];
+        if(proxy.type == 'http' || proxy.type == 'https'){
+            const authStr = atob(proxy.proxyAuthorizationHeader.replace('Basic ', '')).split(':');
+            proxy.username = authStr[0];
+            proxy.password = authStr[1];
+            delete proxy.proxyAuthorizationHeader;
+        }
+    }
+    return newProxies;
 }
