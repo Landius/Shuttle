@@ -24,6 +24,6 @@
     ]
   },
 
-  "permissions": ["proxy", "storage", "privacy", "tabs", "<all_urls>"]
+  "permissions": ["proxy", "storage", "privacy", "tabs", "<all_urls>", "webRequest", "webRequestBlocking"]
 
 }

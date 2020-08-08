@@ -332,7 +332,8 @@ function convertToCredential(proxies){
     let newProxies = {...proxies};
     for(const key in newProxies){
         proxy = newProxies[key];
-        if(proxy.type == 'http' || proxy.type == 'https'){
+        if((proxy.type == 'http' || proxy.type == 'https')
+        && (proxy.username && proxy.password)){
             proxy.proxyAuthorizationHeader = 'Basic ' + btoa(proxy.username + ':' + proxy.password);
             delete proxy.username;
             delete proxy.password;
@@ -345,7 +346,8 @@ function convertFromCredential(proxies) {
     let newProxies = {...proxies};
     for(const key in newProxies){
         proxy = newProxies[key];
-        if(proxy.type == 'http' || proxy.type == 'https'){
+        if((proxy.type == 'http' || proxy.type == 'https')
+        && proxy.proxyAuthorizationHeader){
             const authStr = atob(proxy.proxyAuthorizationHeader.replace('Basic ', '')).split(':');
             proxy.username = authStr[0];
             proxy.password = authStr[1];

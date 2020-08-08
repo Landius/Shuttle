@@ -1,6 +1,7 @@
 body{
     position: relative;
     font-size: 14px;
+    font-family: sans-serif;
     margin: .5em;
     width: max-content;
 }

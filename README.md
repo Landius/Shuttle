@@ -38,9 +38,11 @@ With the 2 exceptions above, Shuttle will handle proxy by request's url instead 
   - [ ] improve page style.
   - [ ] support localization.
   - [ ] count failed requests and show it on the icon badge
+  - [ ] use an unique id instead of name to recognize proxy
 
 - bug
   - [ ] does request of service worker have tab id?
+  - [ ] sending ProxyAuthorizationHeader requires type `https`, does not support `http`?
 
 ## resources
 
