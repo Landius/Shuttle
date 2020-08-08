@@ -41,6 +41,8 @@ storage.get(null, (result) => {
   // handle requests
   browser.proxy.onRequest.addListener(handleRequest, {urls: ["<all_urls>"]});
   browser.proxy.onError.addListener(error=>{ console.error(error); });
+  browser.webRequest.onAuthRequired.addListener(handleAuth, {urls: ["<all_urls>"]}, ["blocking"]);
+  browser.webRequest.onErrorOccurred.addListener(error=>{ console.error('onErrorOccurred: ', error); }, {urls: ["<all_urls>"]});
 
   // handle msg
   browser.runtime.onMessage.addListener(handleMsg);
@@ -107,6 +109,23 @@ function handleRequest(requestInfo){
     });
   }
   return proxyInfoPromise || getProxyByUrl(url).proxyInfo;
+}
+
+function handleAuth(detail){
+  if(detail.isProxy){
+    let blockResponse = null;
+    const keys = ['type', 'host', 'port'];
+    for(const name in data.proxies){
+      const proxy = data.proxies[name];
+      if(keys.every(key=>{ return detail.proxyInfo[key] == proxy[key]; })){
+        blockResponse = {
+          authCredentials: {username: proxy.username, password: proxy.password}
+        };
+        console.log(blockResponse);
+        return blockResponse;
+      }
+    }
+  }
 }
 
 function setIcon(){

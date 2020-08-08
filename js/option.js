@@ -11,7 +11,6 @@ const profileDetail = dm.$('#profile-detail');
 browser.runtime.sendMessage({cmd: 'getData'}).then(renderMain);
 
 function renderMain(data){
-    data.proxies = convertFromCredential(data.proxies);
     window.data = data;
     // add li elements to sidebar
     for(const key in data.proxies){
@@ -47,6 +46,11 @@ function renderMain(data){
     for(const btnId in btnFuncMap){
         dm.$(btnId).onclick = btnFuncMap[btnId];
     }
+
+    // prevent browser from asking save passsword
+    const proxyPwd = dm.$('#proxy-pwd');
+    proxyPwd.addEventListener('focus', e=>{ e.target.removeAttribute('readonly'); });
+    proxyPwd.addEventListener('focusout', e=>{ e.target.setAttribute('readonly', ''); });
 }
 
 function addLi(label, attribs, parentEl, callback){
@@ -317,8 +321,6 @@ function cancel(){
 }
 
 function saveData() {
-    const data = {...window.data};
-    data.proxies = convertToCredential(data.proxies);
     return browser.runtime.sendMessage({cmd: 'setData', data: data}).then(result=>{
         console.log('data saved');
         alert('data saved');
@@ -327,32 +329,34 @@ function saveData() {
     });
 }
 
-// find http proxies, then convert http proxy auth from usr&pwd to proxyAuthorizationHeader
-function convertToCredential(proxies){
-    let newProxies = {...proxies};
-    for(const key in newProxies){
-        proxy = newProxies[key];
-        if((proxy.type == 'http' || proxy.type == 'https')
-        && (proxy.username && proxy.password)){
-            proxy.proxyAuthorizationHeader = 'Basic ' + btoa(proxy.username + ':' + proxy.password);
-            delete proxy.username;
-            delete proxy.password;
-        }
-    }
-    return newProxies;
-}
+// ============ use onAuthRequired instead of Credential =============
 
-function convertFromCredential(proxies) {
-    let newProxies = {...proxies};
-    for(const key in newProxies){
-        proxy = newProxies[key];
-        if((proxy.type == 'http' || proxy.type == 'https')
-        && proxy.proxyAuthorizationHeader){
-            const authStr = atob(proxy.proxyAuthorizationHeader.replace('Basic ', '')).split(':');
-            proxy.username = authStr[0];
-            proxy.password = authStr[1];
-            delete proxy.proxyAuthorizationHeader;
-        }
-    }
-    return newProxies;
-}
+// // find http proxies, then convert http proxy auth from usr&pwd to proxyAuthorizationHeader
+// function convertToCredential(proxies){
+//     let newProxies = {...proxies};
+//     for(const key in newProxies){
+//         proxy = newProxies[key];
+//         if((proxy.type == 'http' || proxy.type == 'https')
+//         && (proxy.username && proxy.password)){
+//             proxy.proxyAuthorizationHeader = 'Basic ' + btoa(proxy.username + ':' + proxy.password);
+//             delete proxy.username;
+//             delete proxy.password;
+//         }
+//     }
+//     return newProxies;
+// }
+
+// function convertFromCredential(proxies) {
+//     let newProxies = {...proxies};
+//     for(const key in newProxies){
+//         proxy = newProxies[key];
+//         if((proxy.type == 'http' || proxy.type == 'https')
+//         && proxy.proxyAuthorizationHeader){
+//             const authStr = atob(proxy.proxyAuthorizationHeader.replace('Basic ', '')).split(':');
+//             proxy.username = authStr[0];
+//             proxy.password = authStr[1];
+//             delete proxy.proxyAuthorizationHeader;
+//         }
+//     }
+//     return newProxies;
+// }
