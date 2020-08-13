@@ -112,7 +112,7 @@ function handleRequest(requestInfo){
 }
 
 function handleAuth(detail){
-  if(detail.isProxy){
+  if(detail.isProxy && detail.proxyInfo.type.includes('http')){
     let blockResponse = null;
     const keys = ['type', 'host', 'port'];
     for(const name in data.proxies){
