@@ -15,12 +15,12 @@
                 <span>Proxies</span>
             </ul>
             <ul class="new">
-                <li id="new-proxy">new</li>
+                <li id="new-proxy" title="create a new proxy">new</li>
             </ul>
             <ul id="profile-tile">
                 <span>Profiles</span>
             </ul>
-            <ul class="new">
+            <ul class="new" title="create a new profile">
                 <li id="new-profile">new</li>
             </ul>
             <ul id="option-tile">
@@ -67,14 +67,15 @@
                 <div>
                     <span class="flex-left">ProxyDNS:</span>
                     <input type="checkbox" id="proxy-dns">
+                    <i title="for socks/socks4 proxy">[?]</i>
                 </div>
                 <hr>
                 <div>
                     <span class="flex-left"></span>
                     <div class="btns flex-right">
-                        <button id="delete-proxy">delete</button>
-                        <button id="confirm-proxy">confirm</button>
-                        <button id="cancel-proxy">cancel</button>
+                        <button id="delete-proxy" title="delete this proxy">delete</button>
+                        <button id="confirm-proxy" title="save changes">confirm</button>
+                        <button id="cancel-proxy" title="discard changes">cancel</button>
                     </div>
                 </div>
             </div>
@@ -98,9 +99,9 @@
                 <div>
                     <span class="flex-left"></span>
                     <div class="flex-right btns">
-                        <button id="delete-profile">delete</button>
-                        <button id="confirm-profile">confirm</button>
-                        <button id="cancel-profile">cancel</button>
+                        <button id="delete-profile"title="delete this profile">delete</button>
+                        <button id="confirm-profile" title="save changes">confirm</button>
+                        <button id="cancel-profile" title="discard changes">cancel</button>
                     </div>
                 </div>
             </div>
@@ -119,10 +120,10 @@
                 <div>
                     <span class="flex-left"></span>
                     <div class="flex-right btns">
-                        <button id="import-setting">import</button>
-                        <button id="export-setting">export</button>
-                        <button id="confirm-setting">confirm</button>
-                        <button id="cancel-setting">cancel</button>
+                        <button id="import-setting" title="import data">import</button>
+                        <button id="export-setting" title="export data">export</button>
+                        <button id="confirm-setting" title="save changes">confirm</button>
+                        <button id="cancel-setting" title="discard changes">cancel</button>
                     </div>
                 </div>
                 <div style="display:none;">

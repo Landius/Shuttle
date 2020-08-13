@@ -91,6 +91,7 @@ ul > li.active{
     user-select: none;
     position: relative;
     background: #eee;
+    cursor: pointer;
 }
 #detail-tile button:active{
     top: 1px;
@@ -159,6 +160,14 @@ select{
 }
 input:focus{
     background-color: #fff;
+}
+input[type=checkbox]{
+    cursor: pointer;
+}
+i{
+    cursor: pointer;
+    font-size: .8em;
+    font-style: normal;
 }
 /*
 button:first-child,
