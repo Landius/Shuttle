@@ -313,11 +313,30 @@ function confirmSetting() {
 }
 
 function importSetting() {
-
+    const el = dm.$('#import-data');
+    el.onchange = e=>{
+        let file = e.target.files[0];
+        let r = new FileReader();
+        r.readAsText(file);
+        r.onload = ()=>{
+            try{
+                window.data = JSON.parse(r.result);
+                renderSetting(window.data.setting);
+            }catch(err){
+                alert('import failed, please check your file...');
+            }
+        }
+    };
+    el.click();
 }
 
 function exportSetting() {
-
+    const filename = 'Shuttle.data.json';
+    const text = JSON.stringify(window.data);
+    const el = dm.$('#export-data');
+    el.setAttribute('download', filename);
+    el.setAttribute('href', 'data:text/plain;base64,' + btoa(text));
+    el.click();
 }
 
 function cancel(){
