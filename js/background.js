@@ -17,7 +17,10 @@ const defaultData = {
         {proxyName: 'proxy', hosts: []}
       ],
     },
-},
+  },
+  setting: {
+    refresh_after_switch: true
+  }
 };
 // init data
 let data = null;
@@ -76,6 +79,7 @@ function handleMsg(msg, sender, sendResponse){
       data.active = msg.active;
       storage.set(data);
       setIcon();
+      refresh();
       break;
     case 'editRule':
       editRule(msg.rule);
@@ -192,4 +196,11 @@ function getProxyByUrl(url){
   }
   let proxyInfo = data.proxies[proxyName];
   return {proxyName, proxyInfo};
+}
+
+function refresh(){
+  console.log('refreshing');
+  if(data.setting.refresh_after_switch){
+    browser.tabs.update(activeTab.id, {url: activeTab.url});
+  }
 }

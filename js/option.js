@@ -200,6 +200,8 @@ function renderSetting(setting){
         div.classList.remove('active');
     }
     dm.$('#setting-detail').classList.add('active');
+    // fill with values
+    dm.$('#refresh-after-switch').checked = window.data.setting.refresh_after_switch;
 }
 
 function newProxy(){
@@ -298,14 +300,16 @@ function confirmProfile() {
     window.activeLi.innerText = profileName;
     // delete old profile
     delete window.data.profiles[window.editing.name];
-    // add new profile
+    // add new profile (profile name might have changed)
     window.data.profiles[profileName] = profile;
     // save to storage
     saveData();
 }
 
 function confirmSetting() {
-
+    // get value
+    window.data.setting.refresh_after_switch = dm.$('#refresh-after-switch').checked;
+    saveData();
 }
 
 function importSetting() {
