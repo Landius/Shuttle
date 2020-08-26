@@ -85,6 +85,7 @@ function handleMsg(msg, sender, sendResponse){
       editRule(msg.rule);
       storage.set(data);
       setIcon();
+      refresh();
       sendResponse();
       break;
     default:

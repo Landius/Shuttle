@@ -44,6 +44,11 @@ With the 2 exceptions above, Shuttle will handle proxy by request's url instead 
   - [ ] does request of service worker have tab id?
   - [ ] sending ProxyAuthorizationHeader requires type `https`, does not support `http`?
 
+## note
+
+- sometimes requests were failed because they are blocked by adblock addons or browser privacy protection.
+- it's recommended to enable proxyDNS for socks proxy to avoid domain pollution.
+
 ## resources
 
 - icon: firefox photon design icon [link](https://design.firefox.com/icons/viewer/).
