@@ -201,6 +201,7 @@ function getProxyByUrl(url){
 
 function refresh(){
   if(data.setting.refresh_after_switch){
-    browser.tabs.update(activeTab.id, {url: activeTab.url});
+    // browser.tabs.update(activeTab.id, {url: activeTab.url});
+    browser.tabs.reload(activeTab.id);
   }
 }

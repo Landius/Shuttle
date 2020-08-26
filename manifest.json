@@ -3,7 +3,7 @@
   "manifest_version": 2,
   "name": "Shuttle",
   "description": "A firefox addon that helps with switching proxies by hostname",
-  "version": "0.99.1",
+  "version": "0.99.2",
 
   "icons": { "48": "img/icon.svg" },
 
