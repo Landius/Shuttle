@@ -25,24 +25,14 @@ With the 2 exceptions above, Shuttle will handle proxy by request's url instead 
 
 ## todo
 
-- feature
-  - [ ] add hint / tips.
-  - [x] support username and password for http proxy
-  - [ ] option page.
-    - [ ] bypass list
-    - [ ] refresh current page after editing or switching operations in popup page
-    - [ ] import/export setting
-  - [ ] about page.
-    - [ ] A basic usage about this addon (open after addon installed)
-    - [ ] license, project url, reference...
-  - [ ] improve page style.
+- [ ] bypass list
+- [ ] about page.
+  - [ ] A basic usage about this addon (open after addon installed)
+  - [ ] license, project url, reference...
   - [ ] support localization.
-  - [ ] count failed requests and show it on the icon badge
-  - [ ] use an unique id instead of name to recognize proxy
 
 - bug
   - [ ] does request of service worker have tab id?
-  - [ ] sending ProxyAuthorizationHeader requires type `https`, does not support `http`?
 
 ## note
 

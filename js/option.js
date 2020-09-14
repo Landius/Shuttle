@@ -203,6 +203,7 @@ function renderSetting(setting){
     // fill with values
     dm.$('#refresh-after-switch').checked = window.data.setting.refresh_after_switch;
     dm.$('#enable-for-extension').checked = window.data.setting.enable_for_extension;
+    dm.$('#enable-logging').checked = window.data.setting.enable_logging;
 }
 
 function newProxy(){
@@ -311,6 +312,7 @@ function confirmSetting() {
     // get value
     window.data.setting.refresh_after_switch = dm.$('#refresh-after-switch').checked;
     window.data.setting.enable_for_extension = dm.$('#enable-for-extension').checked;
+    window.data.setting.enable_logging = dm.$('#enable-logging').checked;
     saveData();
 }
 
@@ -353,35 +355,3 @@ function saveData() {
         alert('error on saving data:' + error);
     });
 }
-
-// ============ use onAuthRequired instead of Credential =============
-
-// // find http proxies, then convert http proxy auth from usr&pwd to proxyAuthorizationHeader
-// function convertToCredential(proxies){
-//     let newProxies = {...proxies};
-//     for(const key in newProxies){
-//         proxy = newProxies[key];
-//         if((proxy.type == 'http' || proxy.type == 'https')
-//         && (proxy.username && proxy.password)){
-//             proxy.proxyAuthorizationHeader = 'Basic ' + btoa(proxy.username + ':' + proxy.password);
-//             delete proxy.username;
-//             delete proxy.password;
-//         }
-//     }
-//     return newProxies;
-// }
-
-// function convertFromCredential(proxies) {
-//     let newProxies = {...proxies};
-//     for(const key in newProxies){
-//         proxy = newProxies[key];
-//         if((proxy.type == 'http' || proxy.type == 'https')
-//         && proxy.proxyAuthorizationHeader){
-//             const authStr = atob(proxy.proxyAuthorizationHeader.replace('Basic ', '')).split(':');
-//             proxy.username = authStr[0];
-//             proxy.password = authStr[1];
-//             delete proxy.proxyAuthorizationHeader;
-//         }
-//     }
-//     return newProxies;
-// }

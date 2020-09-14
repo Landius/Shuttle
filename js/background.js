@@ -1,3 +1,9 @@
+const log = {
+  info: (...msg)=>{ if(data.setting.enable_logging) console.info(msg); },
+  log: (...msg)=>{ if(data.setting.enable_logging) console.log(msg); },
+  warn: (...msg)=>{ if(data.setting.enable_logging) console.warn(msg); },
+  error: (...msg)=>{ if(data.setting.enable_logging) console.error(msg); }
+};
 const storage = browser.storage.sync;
 const defaultData = {
   active: { type: "proxy", name: "proxy" },
@@ -20,7 +26,8 @@ const defaultData = {
   },
   setting: {
     refresh_after_switch: true,
-    enable_for_extension: true
+    enable_for_extension: true,
+    enable_logging: false
   }
 };
 // init data
@@ -35,7 +42,7 @@ let activeTab = {id: -1, url: '', currentProxy: 'direct', currentActive: null};
 
 storage.get(null, (result) => {
   if(browser.runtime.lastError || Object.keys(result).length == 0){
-    console.error(browser.runtime.lastError || 'storage is empty');
+    log.warn(browser.runtime.lastError || 'storage is empty');
     data = defaultData;
     storage.set(data);
   }else{
@@ -44,9 +51,9 @@ storage.get(null, (result) => {
 
   // handle requests
   browser.proxy.onRequest.addListener(handleRequest, {urls: ["<all_urls>"]});
-  browser.proxy.onError.addListener(error=>{ console.error(error); });
+  browser.proxy.onError.addListener(error=>{ log.warn('proxy.onError: ', error); });
   browser.webRequest.onAuthRequired.addListener(handleAuth, {urls: ["<all_urls>"]}, ["blocking"]);
-  browser.webRequest.onErrorOccurred.addListener(error=>{ console.error('onErrorOccurred: ', error); }, {urls: ["<all_urls>"]});
+  browser.webRequest.onErrorOccurred.addListener(error=>{ log.warn('webRequest.onErrorOccurred: ', error); }, {urls: ["<all_urls>"]});
 
   // handle msg
   browser.runtime.onMessage.addListener(handleMsg);
@@ -90,12 +97,13 @@ function handleMsg(msg, sender, sendResponse){
       sendResponse();
       break;
     default:
-      console.error('Unsupported msg:', msg);
+      log.warn('Unsupported msg:', msg);
       break;
   }
 }
 
 function handleRequest(requestInfo){
+  log.log('fn: handleRequest, var: requestInfo)', requestInfo);
   let url, proxyInfoPromise;
   if(requestInfo.documentUrl){
     url = (requestInfo.documentUrl.startsWith('moz-extension://') && data.setting.enable_for_extension) ? 
@@ -108,11 +116,11 @@ function handleRequest(requestInfo){
       if(tab.url){
         return getProxyByUrl(tab.url).proxyInfo;
       }else{
-        console.warn('undefined tab.url, tab & requestInfo below: \n', tab, requestInfo);
+        log.warn('undefined tab.url, tab & requestInfo below: \n', tab, requestInfo);
         return data.active.type == 'proxy' ? data.proxies[data.active.name] : data.proxies[data.profiles[data.active.name].proxyName];
       }
     }).catch(error=>{
-      console.error('Error in onRequest():', error);
+      log.warn('Error in onRequest():', error);
     });
   }
   return proxyInfoPromise || getProxyByUrl(url).proxyInfo;
@@ -128,7 +136,7 @@ function handleAuth(detail){
         blockResponse = {
           authCredentials: {username: proxy.username, password: proxy.password}
         };
-        console.log(blockResponse);
+        log.log('fn: handleAuth, var: blockResponse', blockResponse);
         return blockResponse;
       }
     }
@@ -139,7 +147,7 @@ function setIcon(){
   const winId = browser.windows.WINDOW_ID_CURRENT;
   browser.tabs.query({active: true, windowId: winId}).then(result=>{
     if(result.length != 1){
-      console.error('result of tabs.query:', result);
+      log.warn('result of tabs.query:', result);
     }else{
       activeTab.id = result[0].id;
       activeTab.url = result[0].url;
@@ -152,7 +160,7 @@ function setIcon(){
         icon.state = state;
       }
     }
-  }).catch(error=>{ console.error(error); });
+  }).catch(error=>{ log.error(error); });
 }
 
 function editRule(rule){
@@ -198,6 +206,7 @@ function getProxyByUrl(url){
     }
   }
   let proxyInfo = data.proxies[proxyName];
+  log.log('fn: getProxyByUrl, var: url, proxyName, proxyInfo', url, proxyName, proxyInfo);
   return {proxyName, proxyInfo};
 }
 
