@@ -19,7 +19,8 @@ const defaultData = {
     },
   },
   setting: {
-    refresh_after_switch: true
+    refresh_after_switch: true,
+    enable_for_extension: true
   }
 };
 // init data
@@ -97,7 +98,8 @@ function handleMsg(msg, sender, sendResponse){
 function handleRequest(requestInfo){
   let url, proxyInfoPromise;
   if(requestInfo.documentUrl){
-    url = requestInfo.documentUrl;
+    url = (requestInfo.documentUrl.startsWith('moz-extension://') && data.setting.enable_for_extension) ? 
+      requestInfo.url : requestInfo.documentUrl;
   }else if(requestInfo.tabId == -1 || 'about:blank'){
     // when the request does not belong a tab or belongs to a new tab, just pass the url
     url = requestInfo.url;

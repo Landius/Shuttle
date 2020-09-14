@@ -202,6 +202,7 @@ function renderSetting(setting){
     dm.$('#setting-detail').classList.add('active');
     // fill with values
     dm.$('#refresh-after-switch').checked = window.data.setting.refresh_after_switch;
+    dm.$('#enable-for-extension').checked = window.data.setting.enable_for_extension;
 }
 
 function newProxy(){
@@ -309,6 +310,7 @@ function confirmProfile() {
 function confirmSetting() {
     // get value
     window.data.setting.refresh_after_switch = dm.$('#refresh-after-switch').checked;
+    window.data.setting.enable_for_extension = dm.$('#enable-for-extension').checked;
     saveData();
 }
 
