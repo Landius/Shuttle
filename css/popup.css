@@ -6,9 +6,11 @@ body{
     width: max-content;
 }
 #status{
-    box-shadow: 0 1px 2px 0 #0003;
+    box-shadow: 0 1px 1px 0 #0002;
     margin-bottom: .5em;
-    background-color: #eef5;
+    background-color: #fafafa;
+    border-radius: 3px;
+    border: 1px solid #2333;
 }
 #status > div{
     padding: .5em;
@@ -36,13 +38,13 @@ button{
     position: relative;
     line-height: 1.5;
     padding: 3px 6px;
-    border: none;
-    border-radius: 2px;
+    border: 1px solid #2333;
+    border-radius: 3px;
     outline: none;
     user-select: none;
-    background-color: #eef5;
+    background-color: #fafafa;
     min-width: 4rem;
-    box-shadow: 0 1px 2px 0 #0003;
+    box-shadow: 0 1px 1px 0 #0002;
     cursor: pointer;
     margin: 3px;
 }
@@ -54,9 +56,9 @@ button:last-child{
 }
 button:active{
     top: 1px;
-    box-shadow: 0 1px 1px 0px #0002;
+    box-shadow: none;
 }
 button.active{
-    background-color: #defa;
+    background-color: #eee;
     text-decoration: underline;
 }
