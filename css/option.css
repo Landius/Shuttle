@@ -56,26 +56,34 @@ ul > li{
     overflow: hidden;
     white-space: nowrap;
     width: 80%;
+    position: relative;
+}
+ul > li:hover{
+    text-decoration: underline;
+}
+ul > li.active{
+    font-weight: bold;
+    text-decoration: underline;
+}
+ul > li:hover::before,
+ul > li.active::before{
+    position: absolute;
+    left: -2px;
+    content: ">";
 }
 ul.new > li{
     position: relative;
     top: -10px;
     margin: 0 3px;
 }
-ul > li:hover{
-    /* background-color: #efeff5dd; */
-    text-decoration: underline;
-}
-ul > li:active,
-ul > li.active{
-    /* background-color: #efeff5;
-    box-shadow: inset 0 0 3px 0 #0003; */
-    font-weight: bold;
-    text-decoration: underline;
+ul.new > li:hover::before,
+ul.new > li:active::before{
+    position: absolute;
+    left: -2px;
+    content: "+";
 }
 #detail-tile{
     flex: 1 1 300px;
-    /* box-shadow: -1px 0 2px 0 #0002; */
     border-left: 1px solid #ccc;
 }
 #detail-tile > div{
